@@ -28,7 +28,7 @@ def perform_ocr(document_name: str) -> str:
     DOCUMENT_ROOT_PATH = os.getenv("DOCUMENT_LOCATION")
 
     computervision_client = ComputerVisionClient(COMPUTER_VISION_ENDPOINT, CognitiveServicesCredentials(COMPUTER_VISION_KEY))
-    with open(DOCUMENT_ROOT_PATH + document_name, "rb") as image:
+    with open(DOCUMENT_ROOT_PATH + "uploaded_documents/" + document_name, "rb") as image:
         read_response = computervision_client.read_in_stream(image, raw=True)
 
     read_operation_location = read_response.headers["Operation-Location"]

@@ -8,7 +8,7 @@ def transcribe_audio(audio_file) -> str:
         api_key=os.getenv("OPENAI_API_KEY"),
     )
     
-    audio_file_path = os.getenv("DOCUMENT_LOCATION") + audio_file
+    audio_file_path = os.getenv("DOCUMENT_LOCATION") + 'uploaded_audio/' + audio_file
     audio_file = open(audio_file_path, "rb")
     
     transcription = client.audio.transcriptions.create(
