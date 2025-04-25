@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.services.whisper_service import transcribe_audio
 from app.services.openai_service import ask_openai
 from app.prompts.prompts import AUDIO_TO_SUMMARY_PROMPT
+from app.nlp.preprocessor import process_extracted_text
 
 audio_bp = Blueprint("audio_routes", __name__)
 
@@ -32,9 +33,18 @@ def audio_to_summary():
 
     audio_file = data["audio_file"]
     transcription = transcribe_audio(audio_file)
+    print(f"Raw transcription: {transcription}")
+    print(f"Raw transcription length: {len(transcription)}")
+    processed_transcription = process_extracted_text(transcription)
+    print(f"Processed transcription: {processed_transcription}")
+    print(f"Processed transcription length: {len(processed_transcription)}")
     summary = ask_openai(AUDIO_TO_SUMMARY_PROMPT, transcription)
 
     return jsonify({
         "original_text": transcription,
-        "summary": summary
+        "summary": summary,
+        "tokens_meta": {
+            'pre_processing_tokens': len(transcription),
+            'post_processing_tokens': len(processed_transcription)
+        }
     }), 200

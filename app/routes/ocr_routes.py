@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.services.ocr_service import perform_ocr
 from app.services.openai_service import ask_openai
 from app.prompts.prompts import *
+from app.nlp.preprocessor import process_extracted_text
 
 ocr_bp = Blueprint("ocr_routes", __name__)
 
@@ -47,12 +48,17 @@ def translate_prescription():
     if not extracted_text:
         return jsonify({"error": "Failed to extract text from the document"}), 500
 
-    user_prompt = f"Translate the following medical document to simpler language: {extracted_text}"
+    processed_text = process_extracted_text(extracted_text)
+    user_prompt = f"Translate the following medical document to simpler language: {processed_text}"
     translated_text = ask_openai(TRANSLATION_PROMPT, user_prompt)
 
     return jsonify({
         "original_text": extracted_text,
-        "translated_prescription": translated_text
+        "translated_prescription": translated_text,
+        "tokens_meta": {
+            'pre_processing_tokens': len(extracted_text),
+            'post_processing_tokens': len(processed_text)
+        }
     }), 200
 
 @ocr_bp.route("/translate-prescription-with-medicine", methods=["POST"])
@@ -84,10 +90,11 @@ def translate_prescription_with_medicine():
     if not extracted_text:
         return jsonify({"error": "Failed to extract text from the document"}), 500
 
-    user_prompt_translation = f"Translate the following medical document to simpler language: {extracted_text}"
+    processed_text = process_extracted_text(extracted_text)
+    user_prompt_translation = f"Translate the following medical document to simpler language: {processed_text}"
     translated_prescription = ask_openai(TRANSLATION_PROMPT, user_prompt_translation)
 
-    user_prompt_extraction = f"Extract the medicines from the following prescription: {extracted_text}"
+    user_prompt_extraction = f"Extract the medicines from the following prescription: {processed_text}"
     extracted_medicines = ask_openai(MEDICINE_EXTRACTION_PROMPT, user_prompt_extraction)
 
     user_prompt_medicine_translation = f"Provide the salt profile of the following medicines: {extracted_medicines}"
@@ -96,7 +103,11 @@ def translate_prescription_with_medicine():
     return jsonify({
         "original_text": extracted_text,
         "translated_prescription": translated_prescription,
-        "translated_medicine": translated_medicine
+        "translated_medicine": translated_medicine,
+        "tokens_meta": {
+            'pre_processing_tokens': len(extracted_text),
+            'post_processing_tokens': len(processed_text)
+        }
     }), 200
 
 @ocr_bp.route("/extract-dosage", methods=["POST"])
@@ -128,9 +139,14 @@ def extract_dosage():
     if not extracted_text:
         return jsonify({"error": "Failed to extract text from the document"}), 500
 
-    dosage_info = ask_openai(DOSAGE_PROMPT, extracted_text)
+    processed_text = process_extracted_text(extracted_text)
+    dosage_info = ask_openai(DOSAGE_PROMPT, processed_text)
 
     return jsonify({
         "original_text": extracted_text,
-        "dosage": dosage_info
+        "dosage": dosage_info,
+        "tokens_meta": {
+            'pre_processing_tokens': len(extracted_text),
+            'post_processing_tokens': len(processed_text)
+        }
     }), 200
