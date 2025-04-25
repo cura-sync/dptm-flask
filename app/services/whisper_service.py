@@ -1,6 +1,7 @@
-from openai import OpenAI
 import os
+from openai import OpenAI
 import dotenv
+
 dotenv.load_dotenv()
 
 def transcribe_audio(audio_file) -> str:
