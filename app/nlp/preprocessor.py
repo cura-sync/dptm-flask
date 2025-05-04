@@ -37,7 +37,6 @@ def process_extracted_text(text: str) -> str:
     Main function to process extracted OCR/Whisper text.
     Cleans, deduplicates, removes stopwords to optimize tokens.
     """
-    print(f"Input text length: {len(text)}")
     
     if not text or len(text.strip()) == 0:
         return ""
