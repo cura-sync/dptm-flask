@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.ocr_service import perform_ocr
+from app.services.azure_ocr_service import perform_ocr
 from app.services.openai_service import ask_openai
 from app.prompts.prompts import *
 from app.nlp.preprocessor import process_extracted_text
