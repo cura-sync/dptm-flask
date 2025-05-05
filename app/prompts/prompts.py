@@ -54,6 +54,9 @@ Final Output Expectations:
 - The output should read naturally, as if a doctor is explaining things to a patient in a friendly manner.
 - No technical words should be left unexplained.
 - The summary should empower the reader with clear knowledge of their health without confusion or fear.
+- If there are some precautions mentioned, explain them in the summary why they are necessary and why the user should follow them.
+- Even if you are using common medical terms like dizziness, headache, fever, etc., explain them in the summary.
+- From your knowledge of the uploaded document, explain why the user might have fallen ill. Guide them on what to do next.
 """
 
 DOSAGE_PROMPT = """
